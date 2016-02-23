@@ -1,0 +1,116 @@
+
+import java.io.IOException;
+import java.applet.Applet;
+import java.awt.Color;
+import java.awt.Graphics;
+import com.leapmotion.leap.*;
+import com.leapmotion.leap.Vector;
+
+class LeapListener extends Listener {
+
+	public static int fingerAnzahl;
+	public static Vector handPos;
+
+	public void OnInit(Controller controller) {
+		System.out.println("init");
+	}
+
+	public void onConnect(Controller controller) {
+		System.out.println("connect");
+	}
+
+	public void onFrame(Controller controller) {
+		// Get the most recent frame and report some basic information
+		Frame frame = controller.frame();
+		// System.out.println("Frame id: " + frame.id());
+		// System.out.println("Timestamp: " + frame.timestamp());
+		// System.out.println("Hands: "+ frame.hands().count());
+		// System.out.println("Fingers: " + frame.fingers().count());
+		// System.out.println("Frame id: " + frame.id());
+
+		// Get hands
+		for (Hand hand : frame.hands()) {
+			// String handType = hand.isLeft() ? "Left hand" : "Right hand";
+			// System.out.println(hand.fingers().extended().count()+" " +
+			// handType + ", id: " + hand.id() + ", palm position: " +
+			// hand.palmPosition());
+
+			// Get the hand's normal vector and direction
+			Vector normal = hand.palmNormal();
+			Vector direction = hand.direction();
+			fingerAnzahl = hand.fingers().extended().count();
+			handPos = hand.palmPosition();
+
+		}
+
+		// System.out.println(handPos);
+		// System.out.println(fingerAnzahl);
+
+	}
+
+	public Vector getHandPos() {
+		return handPos;
+	}
+}
+
+public class LeapController {
+
+	public static void main(String[] args) {
+		
+		LeapListener listener = new LeapListener();
+		Controller controller = new Controller();
+		controller.addListener(listener);
+
+		//Kreis4 kreis = new Kreis4();
+		//
+		// drawCenteredCircle(kreis,100,100,4);
+		//Graphics graphic;
+	    Kreis kreis = new Kreis();
+	    kreis.paint();
+	    System.out.println("paint2");
+		try {
+			System.in.read();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		// Remove the sample listener when done
+
+	}
+
+}
+
+class Kreis extends Applet {
+
+	public Graphics g;
+	public void main(){
+		 System.out.println("paint");
+//		paint(kreis);
+	}
+	public void paint() {
+
+		 System.out.println("paint");
+		// set color to red
+		setForeground(Color.red);
+
+		/*
+		 * to draw a oval in an applet window use, void drawOval(int x1,int y1,
+		 * int width, int height) method.
+		 *
+		 * This method draws a oval of specified width and height at (x1,y1)
+		 */
+
+		// this will draw a oval of width 50 & height 100 at (10,10)
+		g.drawOval(10, 10, 50, 100);
+
+		/*
+		 * To draw a filled oval use fillOval(int x1,int y1, int width, int
+		 * height) method of Graphics class.
+		 */
+
+		// draw filled oval
+		g.fillOval(100, 20, 50, 100);
+
+	}
+}
+
+

@@ -1,0 +1,14 @@
+1441109903377	Delete element
+1441109912218	Delete element
+1441136388582	Rename field 'hand'
+1441140502691	Rename method 'berechneGeschwindigkeit'
+1441142286324	Rename field 'radius'
+1441143845189	Rename field 'sollPos'
+1441154260044	Rename local variable 'btn'
+1441211218614	Rename type 'Kreis'
+1441211260163	Rename local variable 'kreis'
+1441232730694	Rename field 'timer'
+1441236940905	Rename field 'currentFrame'
+1441243637489	Rename method 'getHandOpen'
+1441246009603	Rename local variable 'btn_scale'
+1441246219328	Rename field 'scale'

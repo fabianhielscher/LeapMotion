@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<qualifiedTypeNameHistroy>
+<fullyQualifiedTypeName name="com.leapmotion.leap.Gesture"/>
+<fullyQualifiedTypeName name="com.leapmotion.leap.Gesture.State"/>
+<fullyQualifiedTypeName name="java.awt.Graphics"/>
+<fullyQualifiedTypeName name="java.security.acl.Group"/>
+<fullyQualifiedTypeName name="com.leapmotion.leap.CircleGesture"/>
+<fullyQualifiedTypeName name="java.awt.Shape"/>
+<fullyQualifiedTypeName name="LeapController"/>
+<fullyQualifiedTypeName name="javafx.event.EventHandler"/>
+<fullyQualifiedTypeName name="java.awt.TextField"/>
+<fullyQualifiedTypeName name="java.awt.Label"/>
+<fullyQualifiedTypeName name="com.sun.xml.internal.ws.streaming.TidyXMLStreamReader"/>
+<fullyQualifiedTypeName name="Timer"/>
+<fullyQualifiedTypeName name="com.leapmotion.leap.Vector"/>
+<fullyQualifiedTypeName name="java.awt.Color"/>
+<fullyQualifiedTypeName name="GeschwindigkeitsRegelung"/>
+<fullyQualifiedTypeName name="javafx.scene.control.Label"/>
+<fullyQualifiedTypeName name="LeapListener"/>
+<fullyQualifiedTypeName name="javafx.beans.property.StringPropertyBase"/>
+<fullyQualifiedTypeName name="javafx.scene.paint.Color"/>
+<fullyQualifiedTypeName name="javafx.application.Platform"/>
+</qualifiedTypeNameHistroy>

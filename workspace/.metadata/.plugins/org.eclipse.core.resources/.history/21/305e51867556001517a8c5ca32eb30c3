@@ -1,0 +1,96 @@
+
+import com.leapmotion.leap.Controller;
+import com.leapmotion.leap.Frame;
+import com.leapmotion.leap.Hand;
+import com.leapmotion.leap.Listener;
+import com.leapmotion.leap.Vector;
+
+class LeapListener extends Listener {
+
+	public static int fingerAnzahl;
+	public static Vector handPos;
+	public static double zeit;
+	public static boolean handZuSehen;
+
+	public void OnInit(Controller controller) {
+		System.out.println("init");
+	}
+
+	public void onConnect(Controller controller) {
+		System.out.println("connect");
+	}
+
+	public void onFrame(Controller controller) {
+		// Get the most recent frame and report some basic information
+		Frame frame = controller.frame();
+		// System.out.println("Frame id: " + frame.id());
+		// System.out.println("Timestamp: " + frame.timestamp());
+		// System.out.println("Hands: "+ frame.hands().count());
+		// System.out.println("Fingers: " + frame.fingers().count());
+		// System.out.println("Frame id: " + frame.id());
+
+		// Get hands
+		for (Hand hand : frame.hands()) {
+			// String handType = hand.isLeft() ? "Left hand" : "Right hand";
+			// System.out.println(hand.fingers().extended().count()+" " +
+			// handType + ", id: " + hand.id() + ", palm position: " +
+			// hand.palmPosition());
+
+			// Get the hand's normal vector and direction
+			Vector normal = hand.palmNormal();
+			Vector direction = hand.direction();
+			fingerAnzahl = hand.fingers().extended().count();
+			if (hand.palmPosition() != null) {
+				handPos = hand.palmPosition();
+			}
+
+		}
+		// überprüfe ob eine hand zu sehen ist
+		if (handPos == null) {
+			handZuSehen = false;
+		} else {
+			handZuSehen = true;
+		}
+		zeit = frame.timestamp();
+		GeschwindigkeitsRegelung.update();
+
+//		System.out.println(fingerAnzahl);
+
+	}
+
+	public Vector getHandPos() {
+		return handPos;
+	}
+}
+
+public class LeapController {
+
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
+	public static void main(String[] args) {
+
+		init();
+
+	}
+
+	public static void init() {
+
+		LeapListener listener = new LeapListener();
+		Controller controller = new Controller();
+		controller.addListener(listener);
+
+		App app = new App();
+		String[] args = null;
+		app.main(args);
+		// kreis.init();
+		// kreis.paint(Graphics ge);
+		// kreis.paint();
+
+		System.out.println("Initialized");
+
+	}
+
+}

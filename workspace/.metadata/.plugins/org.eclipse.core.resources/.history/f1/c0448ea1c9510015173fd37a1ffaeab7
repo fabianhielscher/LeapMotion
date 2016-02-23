@@ -1,0 +1,69 @@
+import com.leapmotion.leap.Vector;
+
+public class Timer {
+
+	public static Vector dropTimeLastSpot;
+	public static Vector dropTimeStartSpot;
+	public static float dropTimeDistance;
+	public static float dropTimeDistanceMax = 1000;
+	public static double dropTime;
+	public static double lastFrame;
+	public static double currentFrame;
+	public static int counter;
+
+	public static boolean timerActive = false;
+
+	public static void initDrop() {
+		System.out.println("init drop");
+		dropTimeStartSpot = LeapListener.handPos;
+		dropTimeDistance = 0;
+		currentFrame = LeapListener.zeit;
+		lastFrame = LeapListener.zeit;
+		dropTime = 100; // 0.1 Sekunden
+		timerActive = true;
+		counter = 0;
+	}
+
+	public static void updateTime() {
+
+		if (timerActive && LeapListener.handZuSehen) {
+
+			// Zeit aktualisieren
+			currentFrame = LeapListener.zeit;
+
+			if (lastFrame > 0) {
+				dropTime -= (currentFrame - lastFrame) / 1000;
+			}
+
+		
+
+			if (dropTime <= 0) {
+
+				if (dropTimeStartSpot.distanceTo(LeapListener.handPos) < GeschwindigkeitsRegelung.r_min) {
+					// Hand war vor 0.1 Sekunden in der Deadzone
+					counter++;
+					System.out.println("count "+counter);
+
+				} else {
+					// Hand hat Deadzone verlassen
+					// Counter auf 0
+					counter = 0;
+				}
+
+				
+				
+				if (counter >= 10) {
+
+					// füge neue Deadzone ein
+					System.out.println("new dead");
+				}
+
+
+			}
+
+			lastFrame = currentFrame;
+		} else {
+			timerActive = false;
+		}
+	}
+}

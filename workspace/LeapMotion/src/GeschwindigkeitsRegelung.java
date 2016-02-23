@@ -1,0 +1,183 @@
+
+import javafx.scene.paint.Color;
+import com.leapmotion.leap.Vector;
+
+public class GeschwindigkeitsRegelung {
+
+	// Handpositionen aus der Leap API
+	public static float handX, handY, handZ;
+	// Geschwindigkeit
+	public static Vector speed;
+	public static Vector ursprung, handPos, currentPos, lastPos;
+	// Ursprungspunkt eines Durchlaufs
+	public static float handUrsprungX, handUrsprungY, handUrsprungZ;
+	// Abstand zum Ursprungspunkt
+	public static float absUrsprung;
+	// Zielpunkt
+	public static float sollX, sollY, sollZ;
+	public static float v_max = 50;
+	public static float r_min = 10;
+	public static float r_min_normal = 10;
+	// großer Radius für loslassen
+	public static float r_min_big = 50;
+	public static float r_max = 400;
+	public static float k = 0;
+	public static float scale_1 = 1;
+	public static float scale_2 = 1;
+	public static float phi;
+	// Anzahl der ausgestreckten Finger
+	public static int fingerAnzahl;
+	public static boolean ursprungSet = false;
+	public static boolean steuerung_1 = true;
+	public static boolean steuerung_2 = false;
+	public static boolean steuerung_3 = false;
+	public static int steuerung_aktuell = 1;
+	public static boolean mirror = true;
+	public static boolean deadZone = true;
+	// große Deadzone für präziseres loslassen
+	public static boolean deadZoneBigRadius = true;
+	public static boolean twoD = true;
+
+	public static void update() {
+		// System.out.println(currentPos);
+
+		// handX = LeapListener.handPos.getX();
+		// handY = LeapListener.handPos.getY();
+		// handZ = LeapListener.handPos.getZ();
+
+		Timer.updateTime();
+		App.updateHandDot();
+		
+		handPos = LeapListener.handPos;
+		fingerAnzahl = LeapListener.fingerAnzahl;
+
+		if (fingerAnzahl < 4) {
+			if (ursprungSet) {
+				// Hand geschlossen und Ursprung schon gesetzt
+
+				// Bestimme Abstand zum Ursprung
+				absUrsprung = ursprung.distanceTo(handPos);
+
+				if ((steuerung_1 || (steuerung_3 && LeapListener.fingerAnzahl < 2))) {
+					// 0, 1 Finger
+					if (steuerung_aktuell == 2) {
+						reset();
+					}
+					steuerung_aktuell = 1;
+					App.dot.setFill(Color.INDIGO);
+
+					speed = getSpeed();
+					speed = speed.times(scale_1);
+					currentPos = currentPos.plus(speed);
+
+				} else if (steuerung_2 || (steuerung_3 && LeapListener.fingerAnzahl < 4)) {
+					// 2, 3 Finger
+					
+					// Steuerung 2
+					
+					
+					if (steuerung_aktuell == 1) {
+						reset();
+					}
+					steuerung_aktuell = 2;
+					App.dot.setFill(Color.GREEN);
+					// Vektor vom Ursprung zur Hand
+					currentPos = handPos.minus(ursprung);
+
+					// Skalieren und spiegeln
+					if (mirror) {
+						currentPos = currentPos.times(-scale_2);
+					} else {
+						currentPos = currentPos.times(scale_2);
+					}
+
+					// Deadzone Einfluss
+					if (deadZone) {
+						if (handPos.minus(ursprung).magnitude() < r_min) {
+							// innerhalb
+							currentPos = new Vector(0, 0, 0);
+
+						} else {
+							// außerhalb
+							// der Einfluss der Deadzone wird im Positionsvektor
+							// von lastPos gespeichert
+							lastPos = lastPos.minus(currentPos.times(scale_2 * r_min / currentPos.magnitude()));
+							deadZone = false;
+						}
+					}
+
+					// Vektor wird mit der letzten Position addiert
+					currentPos = currentPos.plus(lastPos);
+				}
+
+			} else {
+				// Hand geschlossen und Ursprung noch nicht gesetzt
+
+				reset();
+
+			}
+
+			App.move(currentPos);
+
+		} else {
+			ursprungSet = false;
+			Timer.counter = 0;
+		}
+		
+		App.updateText();
+
+	}
+
+	public static void reset() {
+		// setze Ursprung
+		setOrigin(LeapListener.handPos);
+
+		lastPos = currentPos;
+
+		// resette Dropzeit
+		Timer.initDrop();
+
+	}
+
+	public static void setOrigin(Vector v) {
+		ursprung = v;
+		ursprungSet = true;
+
+		// setze r_min und r_max (Kreise)
+		App.set_r(v);
+		deadZone = true;
+
+	}
+
+	public static Vector getSpeed() {
+
+		Vector v_vec;
+		float v;
+		Vector r_vec = handPos.minus(ursprung);
+
+		// 2D
+		System.out.println(twoD);
+		if (twoD) {
+			r_vec = new Vector(handPos.getX() - ursprung.getX(), 0, handPos.getZ() - ursprung.getZ());
+		}
+
+		// Länge des Vektors
+		float r = r_vec.magnitude();
+
+		float block = k * (v_max) / ((r_max - r_min) * (r_max - r_min));
+
+		// System.out.println(r);
+
+		if (r > r_min) {
+			v = (v_max / r_max) * (r - r_min) + block * (r_max - r) * (r_min - r);
+
+			v_vec = r_vec.normalized();
+			v_vec = v_vec.times(v);
+		} else {
+			v_vec = new Vector(0f, 0f, 0f);
+		}
+		return v_vec;
+
+	}
+
+}

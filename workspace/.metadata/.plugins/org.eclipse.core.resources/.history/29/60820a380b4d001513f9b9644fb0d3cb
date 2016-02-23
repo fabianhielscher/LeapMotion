@@ -1,0 +1,129 @@
+import java.io.IOException;
+
+import com.leapmotion.leap.*;
+import com.leapmotion.leap.Gesture.State;
+
+class LeapListener extends Listener {
+	
+	public static int fingerAnzahl;
+	public static Vector handPos;
+	public void OnInit(Controller controller) {
+		System.out.println("Initialisiert");
+	}
+
+	public void onConnect(Controller controller) {
+		System.out.println("Initialisiert2");
+	}
+
+	public void onFrame(Controller controller) {
+		// Get the most recent frame and report some basic information
+		Frame frame = controller.frame();
+		System.out.println("Frame id: " + frame.id());
+		System.out.println("Timestamp: " + frame.timestamp());
+		System.out.println("Hands: "+ frame.hands().count());
+		System.out.println("Fingers: " + frame.fingers().count());
+		System.out.println("Frame id: " + frame.id());
+		
+		
+
+		// Get hands
+		for (Hand hand : frame.hands()) {
+			String handType = hand.isLeft() ? "Left hand" : "Right hand";
+//			System.out.println(hand.fingers().extended().count()+"  " + handType + ", id: " + hand.id() + ", palm position: " + hand.palmPosition());
+
+			// Get the hand's normal vector and direction
+			Vector normal = hand.palmNormal();
+			Vector direction = hand.direction();
+			fingerAnzahl=hand.fingers().extended().count();
+			handPos=hand.palmPosition();
+		}
+
+		// Get tools
+		for (Tool tool : frame.tools()) {
+			System.out.println("  Tool id: " + tool.id() + ", position: " + tool.tipPosition() + ", direction: "
+					+ tool.direction());
+		}
+
+		GestureList gestures = frame.gestures();
+		for (int i = 0; i < gestures.count(); i++) {
+			Gesture gesture = gestures.get(i);
+
+			switch (gesture.type()) {
+			case TYPE_CIRCLE:
+				CircleGesture circle = new CircleGesture(gesture);
+
+				// Calculate clock direction using the angle between circle
+				// normal and pointable
+				String clockwiseness;
+				if (circle.pointable().direction().angleTo(circle.normal()) <= Math.PI / 2) {
+					// Clockwise if angle is less than 90 degrees
+					clockwiseness = "clockwise";
+				} else {
+					clockwiseness = "counterclockwise";
+				}
+
+				// Calculate angle swept since last frame
+				double sweptAngle = 0;
+				if (circle.state() != State.STATE_START) {
+					CircleGesture previousUpdate = new CircleGesture(controller.frame(1).gesture(circle.id()));
+					sweptAngle = (circle.progress() - previousUpdate.progress()) * 2 * Math.PI;
+				}
+
+				System.out.println("  Circle id: " + circle.id() + ", " + circle.state() + ", progress: "
+						+ circle.progress() + ", radius: " + circle.radius() + ", angle: " + Math.toDegrees(sweptAngle)
+						+ ", " + clockwiseness);
+				break;
+			case TYPE_SWIPE:
+				SwipeGesture swipe = new SwipeGesture(gesture);
+				System.out.println("  Swipe id: " + swipe.id() + ", " + swipe.state() + ", position: "
+						+ swipe.position() + ", direction: " + swipe.direction() + ", speed: " + swipe.speed());
+				break;
+			case TYPE_SCREEN_TAP:
+				ScreenTapGesture screenTap = new ScreenTapGesture(gesture);
+				System.out.println("  Screen Tap id: " + screenTap.id() + ", " + screenTap.state() + ", position: "
+						+ screenTap.position() + ", direction: " + screenTap.direction());
+				break;
+			case TYPE_KEY_TAP:
+				KeyTapGesture keyTap = new KeyTapGesture(gesture);
+				System.out.println("  Key Tap id: " + keyTap.id() + ", " + keyTap.state() + ", position: "
+						+ keyTap.position() + ", direction: " + keyTap.direction());
+				break;
+			default:
+				System.out.println("Unknown gesture type.");
+				break;
+			}
+		}
+
+		if (!frame.hands().isEmpty() || !gestures.isEmpty()) {
+			System.out.println();
+		}
+	}
+}
+
+public class LeapController {
+
+	public static void main(String[] args) {
+		// TODO Auto-generated method stub
+		LeapListener listener = new LeapListener();
+		Controller controller = new Controller();
+
+		controller.addListener(listener);
+		System.out.println("Initialisiert1");
+		
+	       // Keep this process running until Enter is pressed
+        System.out.println("Press Enter to quit...");
+        System.out.println("aaaaaaaaaaaaaaaa"+controller.frame().fingers().count());
+        try {
+            System.in.read();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        // Remove the sample listener when done
+        
+  
+        
+ 
+    
+	}
+
+}
